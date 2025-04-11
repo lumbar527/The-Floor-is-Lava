@@ -487,8 +487,8 @@ function constrain_wall(wall,plane)
             -- love.graphics.print(wall[2].x-query[2] - math.sin(p.a * math.pi * 2))
             wall[2].x = query[2] + math.sin(p.a * math.pi * 2)
             wall[2].y = query[3] + math.cos(p.a * math.pi * 2)
-            wall[4].x = query[2] + math.sin(p.a * math.pi * 2)
-            wall[4].y = query[3] + math.cos(p.a * math.pi * 2)
+            wall[3].x = query[2] + math.sin(p.a * math.pi * 2)
+            wall[3].y = query[3] + math.cos(p.a * math.pi * 2)
             if not do_intersect(plane[1],plane[2],plane[3],plane[4],wall[2].x,wall[2].y,p.x,p.y)[1] then
                 x()
             end
@@ -499,8 +499,8 @@ function constrain_wall(wall,plane)
             -- local oldwall = {wall[1].x,wall[1].y}
             wall[1].x = query[2] + math.sin(p.a * math.pi * 2)
             wall[1].y = query[3] + math.cos(p.a * math.pi * 2)
-            wall[3].x = query[2] + math.sin(p.a * math.pi * 2)
-            wall[3].y = query[3] + math.cos(p.a * math.pi * 2)
+            wall[4].x = query[2] + math.sin(p.a * math.pi * 2)
+            wall[4].y = query[3] + math.cos(p.a * math.pi * 2)
             -- if oldwall[1]==wall[1].x + math.sin(p.a * math.pi * 2) and oldwall[2]==wall[1].y + math.cos(p.a * math.pi * 2) then
             --     scream()
             -- end
