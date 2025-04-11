@@ -171,7 +171,7 @@ function main()
     local lplane=make_cplane(p.x,p.y,p.a,10,100)
 
     for i=1,#walls do
-        love.graphics.line(walls[i][1].x+400,walls[i][1].y+400,walls[i][2].x+400,walls[i][2].y+400)
+        love.graphics.line(walls[i][1].x+20,walls[i][1].y+20,walls[i][2].x+20,walls[i][2].y+20)
         -- love.graphics.polygon("line",math.sqrt((walls[i][1].x-p.x)^2+(walls[i][1].y-p.y)^2)+64,64+walls[i][1].z,math.sqrt((walls[i][2].x-p.x)^2+(walls[i][2].y-p.y)^2)+64,64+walls[i][2].z,math.sqrt((walls[i][3].x-p.x)^2+(walls[i][3].y-p.y)^2)+64,64+walls[i][3].z,math.sqrt((walls[i][4].x-p.x)^2+(walls[i][4].y-p.y)^2)+64,64+walls[i][4].z)
     end
 
@@ -280,7 +280,8 @@ function main()
     --     love.graphics.circle("line",points[i].x,points[i].y,5)
     --     love.graphics.line(points[i].x,points[i].y,p.x,p.y)
     -- end
-    love.graphics.line(lplane[1]+400,lplane[2]+400,lplane[3]+400,lplane[4]+400)
+    love.graphics.line(lplane[1]+20,lplane[2]+20,lplane[3]+20,lplane[4]+20)
+    love.graphics.line(p.x+20,p.y+20,p.x+20+math.sin(p.a*math.pi*2),p.y+20+math.cos(p.a*math.pi*2))
     -- love.graphics.line(vplane[1],vplane[2],vplane[3],vplane[4])
 end
 
@@ -606,6 +607,7 @@ function can_move(x,y,z,r,a)
     local point_list = {}
 
     for i=1,#sectors do
+        point_list = {}
         for j=1,#sectors[i].points do
             point_list[#point_list+1] = map[sectors[i].points[j]].x
             point_list[#point_list+1] = map[sectors[i].points[j]].y
