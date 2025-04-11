@@ -4,7 +4,7 @@ A work-in-progress fps engine.
 
 ### Todo
 
-- [ ] Clipping
+- [x] Clipping
 - [ ] Opacity
 - [ ] Textures
 - [ ] Combat

@@ -87,7 +87,8 @@ function do_intersect(x1,y1,x2,y2,x3,y3,x4,y4)
         -- if p_x>=math.min(x1,x2) and p_x<=math.max(x1,x2) and p_y>=math.min(y1,y2) and p_y<=math.max(y1,y2) and p_x>=math.min(x3,x4) and p_x<=math.max(x3,x4) and p_y>=math.min(y3,y4) and p_y<=math.max(y3,y4) then
         if p_x>=math.min(x3,x4) and p_x<=math.max(x3,x4) and p_y>=math.min(y3,y4) and p_y<=math.max(y3,y4) then
             local dist=math.sqrt((x1-p_x)^2 + (y1-p_y)^2)
-            if math.sqrt((x2-p_x)^2 + (y2-p_y)^2) > math.sqrt((x1-x2)^2 + (y1-y2)^2) and math.sqrt((x1-p_x)^2 + (y1-p_y)^2) < math.sqrt((x1-x2)^2 + (y1-y2)^2) then
+            -- if math.sqrt((x2-p_x)^2 + (y2-p_y)^2) > math.sqrt((x1-x2)^2 + (y1-y2)^2) and math.sqrt((x1-p_x)^2 + (y1-p_y)^2) < math.sqrt((x1-x2)^2 + (y1-y2)^2) then
+            if (x2 - x1 < 0 and p_x - x1 >= 0) or (x2 - x1 >= 0 and p_x - x1 < 0) then
                 dist = -dist
             end
 
@@ -137,9 +138,10 @@ function make_cplane(cx,cy,a,cd,cw)
 end
 
 function main()
-    love.graphics.setColor(255,255,255)
-    love.graphics.rectangle("fill",0,0,800,800)
+    love.graphics.setColor(1,1,1)
+    love.graphics.rectangle("fill",0,0,screen.w,screen.h)
     love.graphics.setColor(0,0,0)
+    love.graphics.rectangle("line",0,0,screen.w,screen.h)
 
     local nothing = nil
 
@@ -165,6 +167,8 @@ function main()
 	local pplane=make_cplane(p.x,p.y,p.a,10,20)
 	local vplane=make_cplane(54,63+p.z+10,p.va,10,10)
     walls = generate_walls(sectors,points,pplane)
+
+    local lplane=make_cplane(p.x,p.y,p.a,10,100)
 
     for i=1,#walls do
         love.graphics.line(walls[i][1].x+400,walls[i][1].y+400,walls[i][2].x+400,walls[i][2].y+400)
@@ -276,7 +280,7 @@ function main()
     --     love.graphics.circle("line",points[i].x,points[i].y,5)
     --     love.graphics.line(points[i].x,points[i].y,p.x,p.y)
     -- end
-    love.graphics.line(pplane[1]+400,pplane[2]+400,pplane[3]+400,pplane[4]+400)
+    love.graphics.line(lplane[1]+400,lplane[2]+400,lplane[3]+400,lplane[4]+400)
     -- love.graphics.line(vplane[1],vplane[2],vplane[3],vplane[4])
 end
 
