@@ -613,7 +613,7 @@ function can_move(x,y,z,r,a)
             point_list[#point_list+1] = map[sectors[i].points[j]].y
         end
         if point_in_polygon(x,y,point_list) then
-            if sectors[i].f <= p.z + 3 and sectors[i].c >= p.z + 9 then
+            if (sectors[i].f <= p.z + 3 and sectors[i].c >= p.z + 9) or (sectors[i].f < p.z and sectors[i].c > p.z + 7) then
                 return true, sectors[i].f
             end
         end
