@@ -58,6 +58,8 @@ function init()
 	horizon=0
 	moving=false
 	wait=90
+    mx = 0
+    my = 0
     editor_init()
 end
 
@@ -147,26 +149,41 @@ function main()
 
 	pts={}
 
-    if love.keyboard.isDown("left") then
-        p.a = p.a + .01
-    end
-    if love.keyboard.isDown("right") then
-        p.a = p.a - .01
-    end
-    if love.keyboard.isDown("up") and can_move(p.x+math.sin(p.a*math.pi*2),p.y+math.cos(p.a*math.pi*2),p.z,2,p.a) then
+    -- if love.keyboard.isDown("left") then
+    --     p.a = p.a + .01
+    -- end
+    -- if love.keyboard.isDown("right") then
+    --     p.a = p.a - .01
+    -- end
+    p.a = p.a - mx/100
+    p.va = p.va + my/100
+    love.graphics.print(mx/100)
+    mx = 0
+    my = 0
+    if love.keyboard.isDown("w") and can_move(p.x+math.sin(p.a*math.pi*2),p.y+math.cos(p.a*math.pi*2),p.z,2,p.a) then
         p.x = p.x + math.sin(p.a*math.pi*2)
         p.y = p.y + math.cos(p.a*math.pi*2)
         nothing,p.z = can_move(p.x+math.sin(p.a*math.pi*2),p.y+math.cos(p.a*math.pi*2),p.z,2,p.a)
     end
-    if love.keyboard.isDown("down") and can_move(p.x-math.sin(p.a*math.pi*2),p.y-math.cos(p.a*math.pi*2),p.z,2,p.a) then
+    if love.keyboard.isDown("s") and can_move(p.x-math.sin(p.a*math.pi*2),p.y-math.cos(p.a*math.pi*2),p.z,2,p.a) then
         p.x = p.x - math.sin(p.a*math.pi*2)
         p.y = p.y - math.cos(p.a*math.pi*2)
         nothing,p.z = can_move(p.x-math.sin(p.a*math.pi*2),p.y-math.cos(p.a*math.pi*2),p.z,2,p.a)
     end
+    if love.keyboard.isDown("d") and can_move(p.x-math.sin(p.a*math.pi*2),p.y+math.cos(p.a*math.pi*2),p.z,2,p.a) then
+        p.x = p.x - math.sin(p.a*math.pi*2)
+        p.y = p.y + math.cos(p.a*math.pi*2)
+        nothing,p.z = can_move(p.x-math.sin(p.a*math.pi*2),p.y+math.cos(p.a*math.pi*2),p.z,2,p.a)
+    end
+    if love.keyboard.isDown("a") and can_move(p.x+math.sin(p.a*math.pi*2),p.y-math.cos(p.a*math.pi*2),p.z,2,p.a) then
+        p.x = p.x + math.sin(p.a*math.pi*2)
+        p.y = p.y - math.cos(p.a*math.pi*2)
+        nothing,p.z = can_move(p.x+math.sin(p.a*math.pi*2),p.y-math.cos(p.a*math.pi*2),p.z,2,p.a)
+    end
 
 	local pplane=make_cplane(p.x,p.y,p.a,10,20)
 	local vplane=make_cplane(54,63+p.z+10,p.va,10,10)
-    walls = generate_walls(sectors,points,pplane)
+    walls = generate_walls(sectors,points,pplane,vplane)
 
     local lplane=make_cplane(p.x,p.y,p.a,10,100)
 
@@ -323,7 +340,7 @@ function dist_func(a,b) -- not in use but I like it.
     return dist_a > dist_b
 end
 
-function generate_walls(sect,map,plane) -- maybe put clipping here
+function generate_walls(sect,map,plane,vplane) -- maybe put clipping here
     local val = {}
     for i=1,#sect do
         for j=1,#sectors[i].points do
@@ -338,7 +355,7 @@ function generate_walls(sect,map,plane) -- maybe put clipping here
                             {x = map[sect[i].points[1]].x, y = map[sect[i].points[1]].y, z = ceiling},
                             {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = ceiling},
                         }
-                        val[#val] = constrain_wall(val[#val],plane)
+                        val[#val] = constrain_wall(val[#val],plane,vplane)
                     end
                     if floor2~=ceiling2 then
                         val[#val+1] =
@@ -348,7 +365,7 @@ function generate_walls(sect,map,plane) -- maybe put clipping here
                             {x = map[sect[i].points[1]].x, y = map[sect[i].points[1]].y, z = ceiling2},
                             {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = ceiling2},
                         }
-                        val[#val] = constrain_wall(val[#val],plane)
+                        val[#val] = constrain_wall(val[#val],plane,vplane)
                     end
                     if floor==ceiling and floor2==ceiling2 then
                         val[#val+1] =
@@ -358,7 +375,7 @@ function generate_walls(sect,map,plane) -- maybe put clipping here
                             {x = map[sect[i].points[1]].x, y = map[sect[i].points[1]].y, z = sect[i].c},
                             {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = sect[i].c},
                         }
-                        val[#val] = constrain_wall(val[#val],plane)
+                        val[#val] = constrain_wall(val[#val],plane,vplane)
                     end
                 end
                 -- val[#val+1] =
@@ -379,7 +396,7 @@ function generate_walls(sect,map,plane) -- maybe put clipping here
                             {x = map[sect[i].points[j+1]].x, y = map[sect[i].points[j+1]].y, z = ceiling},
                             {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = ceiling},
                         }
-                        val[#val] = constrain_wall(val[#val],plane)
+                        val[#val] = constrain_wall(val[#val],plane,vplane)
                     end
                     if floor2~=ceiling2 then
                         val[#val+1] =
@@ -389,7 +406,7 @@ function generate_walls(sect,map,plane) -- maybe put clipping here
                             {x = map[sect[i].points[j+1]].x, y = map[sect[i].points[j+1]].y, z = ceiling2},
                             {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = ceiling2},
                         }
-                        val[#val] = constrain_wall(val[#val],plane)
+                        val[#val] = constrain_wall(val[#val],plane,vplane)
                     end
                     if floor==ceiling and floor2==ceiling2 then
                         val[#val+1] =
@@ -404,7 +421,7 @@ function generate_walls(sect,map,plane) -- maybe put clipping here
                         -- file:write(tostring(os.time()).." gw: "..tostring(map[i].z).."\n") -- nil
                         -- file:close()
                         -- log_error("gw: "..tostring(val[#val][1].z))
-                        val[#val] = constrain_wall(val[#val],plane)
+                        val[#val] = constrain_wall(val[#val],plane,vplane)
                     end
                 end
                 -- val[#val+1] =
@@ -483,7 +500,7 @@ function wall_or_not(a,b,exclude)
     return true
 end
 
-function constrain_wall(wall,plane)
+function constrain_wall(wall,plane,vplane)
     -- add vplane check as well
     local query = do_intersect(plane[1],plane[2],plane[3],plane[4],wall[1].x,wall[1].y,wall[2].x,wall[2].y)
     if query[1] then
@@ -513,10 +530,10 @@ function constrain_wall(wall,plane)
             -- y()
         end
     end
-    return wall
+    return constrain_wall_v(wall,vplane)
 end
 
-function constrain_wall_v(wall,plane)
+function constrain_wall_v(wall,plane) -- make work
     -- vplane check
     local pdist1 = math.sqrt((wall[1].x - p.x)^2 + (wall[1].y - p.y)^2)
     local pdist2 = math.sqrt((wall[2].x - p.x)^2 + (wall[2].y - p.y)^2)
@@ -665,6 +682,11 @@ function log_error(text)
     file:close()
 end
 
+function love.mousemoved( x, y, dx, dy, istouch )
+	mx = dx
+    my = dy
+end
+
 init()
 
 function love.update(dt)
@@ -673,8 +695,10 @@ end
 
 function love.draw()
     if editor then
+        love.mouse.setRelativeMode(false)
         editor_main()
     else
+        love.mouse.setRelativeMode(true)
         main()
     end
 end
