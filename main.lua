@@ -156,8 +156,8 @@ function main()
     --     p.a = p.a - .01
     -- end
     p.a = p.a - mx/100
-    p.va = p.va + my/100
-    love.graphics.print(mx/100)
+    -- p.va = p.va + my/100
+    -- love.graphics.print(mx/100)
     mx = 0
     my = 0
     if love.keyboard.isDown("w") and can_move(p.x+math.sin(p.a*math.pi*2),p.y+math.cos(p.a*math.pi*2),p.z,2,p.a) then
@@ -186,10 +186,11 @@ function main()
     walls = generate_walls(sectors,points,pplane,vplane)
 
     local lplane=make_cplane(p.x,p.y,p.a,10,100)
+	local lvplane=make_cplane(54,63+p.z+10,p.va,10,100)
 
     for i=1,#walls do
-        love.graphics.line(walls[i][1].x+20,walls[i][1].y+20,walls[i][2].x+20,walls[i][2].y+20)
-        -- love.graphics.polygon("line",math.sqrt((walls[i][1].x-p.x)^2+(walls[i][1].y-p.y)^2)+64,64+walls[i][1].z,math.sqrt((walls[i][2].x-p.x)^2+(walls[i][2].y-p.y)^2)+64,64+walls[i][2].z,math.sqrt((walls[i][3].x-p.x)^2+(walls[i][3].y-p.y)^2)+64,64+walls[i][3].z,math.sqrt((walls[i][4].x-p.x)^2+(walls[i][4].y-p.y)^2)+64,64+walls[i][4].z)
+        -- love.graphics.line(walls[i][1].x+20,walls[i][1].y+20,walls[i][2].x+20,walls[i][2].y+20)
+        love.graphics.polygon("line",math.sqrt((walls[i][1].x-p.x)^2+(walls[i][1].y-p.y)^2)+64,64+walls[i][1].z,math.sqrt((walls[i][2].x-p.x)^2+(walls[i][2].y-p.y)^2)+64,64+walls[i][2].z,math.sqrt((walls[i][3].x-p.x)^2+(walls[i][3].y-p.y)^2)+64,64+walls[i][3].z,math.sqrt((walls[i][4].x-p.x)^2+(walls[i][4].y-p.y)^2)+64,64+walls[i][4].z)
     end
 
 	for i=1,#walls do
@@ -297,9 +298,10 @@ function main()
     --     love.graphics.circle("line",points[i].x,points[i].y,5)
     --     love.graphics.line(points[i].x,points[i].y,p.x,p.y)
     -- end
-    love.graphics.line(lplane[1]+20,lplane[2]+20,lplane[3]+20,lplane[4]+20)
-    love.graphics.line(p.x+20,p.y+20,p.x+20+math.sin(p.a*math.pi*2),p.y+20+math.cos(p.a*math.pi*2))
-    -- love.graphics.line(vplane[1],vplane[2],vplane[3],vplane[4])
+
+    -- love.graphics.line(lplane[1]+20,lplane[2]+20,lplane[3]+20,lplane[4]+20)
+    -- love.graphics.line(p.x+20,p.y+20,p.x+20+math.sin(p.a*math.pi*2),p.y+20+math.cos(p.a*math.pi*2))
+    love.graphics.line(lvplane[1],lvplane[2],lvplane[3],lvplane[4])
 end
 
 function hit_square(px,py,px2,py2,sx,sy,sx3,sy3,sx4,sy4,sx2,sy2)
@@ -530,64 +532,96 @@ function constrain_wall(wall,plane,vplane)
             -- y()
         end
     end
-    return constrain_wall_v(wall,vplane)
+    return wall--constrain_wall_v(wall,vplane)
 end
 
 function constrain_wall_v(wall,plane) -- make work
     -- vplane check
-    local pdist1 = math.sqrt((wall[1].x - p.x)^2 + (wall[1].y - p.y)^2)
-    local pdist2 = math.sqrt((wall[2].x - p.x)^2 + (wall[2].y - p.y)^2)
-    local pdist3 = math.sqrt((wall[3].x - p.x)^2 + (wall[3].y - p.y)^2)
-    local pdist4 = math.sqrt((wall[4].x - p.x)^2 + (wall[4].y - p.y)^2)
+
+    local pdist1 = dist_non_absolute(wall[1].x,wall[1].y,p.x,p.y,0,p.z,0,p.z+10) --math.sqrt((wall[1].x - p.x)^2 + (wall[1].y - p.y)^2)
+    local pdist2 = dist_non_absolute(wall[2].x,wall[2].y,p.x,p.y,0,p.z,0,p.z+10) --math.sqrt((wall[2].x - p.x)^2 + (wall[2].y - p.y)^2)
+    local pdist3 = dist_non_absolute(wall[3].x,wall[3].y,p.x,p.y,0,p.z,0,p.z+10) --math.sqrt((wall[3].x - p.x)^2 + (wall[3].y - p.y)^2)
+    local pdist4 = dist_non_absolute(wall[4].x,wall[4].y,p.x,p.y,0,p.z,0,p.z+10) --math.sqrt((wall[4].x - p.x)^2 + (wall[4].y - p.y)^2)
     local pdist = {pdist1,pdist2,pdist3,pdist4}
-    local tan = 0
+    local tan = math.tan(p.a * math.pi * 2)
     local mod = 1
+    if p.a < .25 and p.a < .75 then
+        mod = -1
+    end
+    local next_pt = 0
+    local query = {}
+
     for i=1,4 do
+        -- get the next point
         if i==4 then
-            local query = do_intersect(plane[1],plane[2],plane[3],plane[4],pdist[i]+64,64+wall[i].z,pdist[1]+64,64+wall[1].z)
-            if query[1] then
-                if do_intersect(plane[1],plane[2],plane[3],plane[4],pdist[i]+64,64+wall[i].z,54,63)[1] then -- pdist+64,64+walls[1].z,54,63
-                    tan = math.tan(p.a * math.pi * 2)
-                    if p.a < .25 and p.a < .75 then
-                        mod = -1
-                    else
-                        mod = 1
-                    end
-                    wall[i].y = (query[2] + math.sin(p.va * math.pi * 2)) / math.sqrt(tan^2 + 1)
-                    wall[i].x = mod * tan * wall[i].y
-                    wall[i].z = query[3] + math.cos(p.a * math.pi * 2)
-                elseif do_intersect(plane[1],plane[2],plane[3],plane[4],pdist[1]+64,64+wall[1].z,54,63)[1] then
-                    wall[1].y = (query[2] + math.sin(p.va * math.pi * 2)) / math.sqrt(tan^2 + 1)
-                    wall[1].x = mod * tan * wall[1].y
-                    wall[1].z = query[3] + math.cos(p.a * math.pi * 2)
-                end
-            end
+            next_pt = 1
         else
-            -- file = love.filesystem.newFile("error.txt")
-            -- file:open("a")
-            -- file:write(tostring(os.time()).." cwv: "..tostring(map[i].z).."\n") -- nil
-            -- file:close()
-            -- log_error("cwv: "..tostring(pdist[i]))
-            local query = do_intersect(plane[1],plane[2],plane[3],plane[4],pdist[i]+64,64+wall[i].z,pdist[i+1]+64,64+wall[i+1].z)
-            if query[1] then
-                if do_intersect(plane[1],plane[2],plane[3],plane[4],pdist[i]+64,64+wall[i].z,54,63)[1] then -- pdist+64,64+walls[1].z,54,63
-                    tan = math.tan(p.a * math.pi * 2)
-                    if p.a < .25 and p.a < .75 then
-                        mod = -1
-                    else
-                        mod = 1
-                    end
-                    wall[i].y = (query[2] + math.sin(p.va * math.pi * 2)) / math.sqrt(tan^2 + 1)
-                    wall[i].x = mod * tan * wall[i].y
-                    wall[i].z = query[3] + math.cos(p.a * math.pi * 2)
-                elseif do_intersect(plane[1],plane[2],plane[3],plane[4],pdist[i+1]+64,64+wall[i+1].z,54,63)[1] then
-                    wall[i+1].y = (query[2] + math.sin(p.va * math.pi * 2)) / math.sqrt(tan^2 + 1)
-                    wall[i+1].x = mod * tan * wall[i+1].y
-                    wall[i+1].z = query[3] + math.cos(p.a * math.pi * 2)
-                end
-            end
+            next_pt = i + 1
+        end
+        -- what's the visibility of this line?
+        if do_intersect(plane[1],plane[2],plane[3],plane[4],pdist[i]+64,64+wall[i].z,54,63)[1] and do_intersect(plane[1],plane[2],plane[3],plane[4],pdist[next_pt]+64,64+wall[next_pt].z,54,63)[1] then
+            -- do nothing
+        elseif do_intersect(plane[1],plane[2],plane[3],plane[4],pdist[i]+64,64+wall[i].z,54,63)[1] then
+            query = do_intersect(plane[1],plane[2],plane[3],plane[4],pdist[i]+64,64+wall[i].z,pdist[next_pt]+64,64+wall[next_pt].z)
+            wall[next_pt].y = query[6] / math.sqrt(tan^2 + 1)
+            wall[next_pt].x = mod * tan * wall[next_pt].y
+            pdist[next_pt] = dist_non_absolute(wall[next_pt].x,wall[next_pt].y,p.x,p.y,0,p.z,0,p.z+10)
+        elseif do_intersect(plane[1],plane[2],plane[3],plane[4],pdist[next_pt]+64,64+wall[next_pt].z,54,63)[1] then
+            query = do_intersect(plane[1],plane[2],plane[3],plane[4],pdist[i]+64,64+wall[i].z,pdist[next_pt]+64,64+wall[next_pt].z)
+            wall[i].y = query[6] / math.sqrt(tan^2 + 1)
+            wall[i].x = mod * tan * wall[i].y
+            pdist[i] = dist_non_absolute(wall[i].x,wall[i].y,p.x,p.y,0,p.z,0,p.z+10)
+        else
+
         end
     end
+
+    -- for i=1,4 do
+    --     if i==4 then
+    --         local query = do_intersect(plane[1],plane[2],plane[3],plane[4],pdist[i]+64,64+wall[i].z,pdist[1]+64,64+wall[1].z)
+    --         if query[1] then
+    --             if do_intersect(plane[1],plane[2],plane[3],plane[4],pdist[i]+64,64+wall[i].z,54,63)[1] then -- pdist+64,64+walls[1].z,54,63
+    --                 tan = math.tan(p.a * math.pi * 2)
+    --                 if p.a < .25 and p.a < .75 then
+    --                     mod = -1
+    --                 else
+    --                     mod = 1
+    --                 end
+    --                 wall[i].y = (query[2] + math.sin(p.va * math.pi * 2)) / math.sqrt(tan^2 + 1)
+    --                 wall[i].x = mod * tan * wall[i].y
+    --                 wall[i].z = query[3] + math.cos(p.a * math.pi * 2)
+    --             elseif do_intersect(plane[1],plane[2],plane[3],plane[4],pdist[1]+64,64+wall[1].z,54,63)[1] then
+    --                 wall[1].y = (query[2] + math.sin(p.va * math.pi * 2)) / math.sqrt(tan^2 + 1)
+    --                 wall[1].x = mod * tan * wall[1].y
+    --                 wall[1].z = query[3] + math.cos(p.a * math.pi * 2)
+    --             end
+    --         end
+    --     else
+    --         -- file = love.filesystem.newFile("error.txt")
+    --         -- file:open("a")
+    --         -- file:write(tostring(os.time()).." cwv: "..tostring(map[i].z).."\n") -- nil
+    --         -- file:close()
+    --         -- log_error("cwv: "..tostring(pdist[i]))
+    --         local query = do_intersect(plane[1],plane[2],plane[3],plane[4],pdist[i]+64,64+wall[i].z,pdist[i+1]+64,64+wall[i+1].z)
+    --         if query[1] then
+    --             if do_intersect(plane[1],plane[2],plane[3],plane[4],pdist[i]+64,64+wall[i].z,54,63)[1] then -- pdist+64,64+walls[1].z,54,63
+    --                 tan = math.tan(p.a * math.pi * 2)
+    --                 if p.a < .25 and p.a < .75 then
+    --                     mod = -1
+    --                 else
+    --                     mod = 1
+    --                 end
+    --                 wall[i].y = (query[2] + math.sin(p.va * math.pi * 2)) / math.sqrt(tan^2 + 1)
+    --                 wall[i].x = mod * tan * wall[i].y
+    --                 wall[i].z = query[3] + math.cos(p.a * math.pi * 2)
+    --             elseif do_intersect(plane[1],plane[2],plane[3],plane[4],pdist[i+1]+64,64+wall[i+1].z,54,63)[1] then
+    --                 wall[i+1].y = (query[2] + math.sin(p.va * math.pi * 2)) / math.sqrt(tan^2 + 1)
+    --                 wall[i+1].x = mod * tan * wall[i+1].y
+    --                 wall[i+1].z = query[3] + math.cos(p.a * math.pi * 2)
+    --             end
+    --         end
+    --     end
+    -- end
     return wall
 end
 
@@ -685,6 +719,14 @@ end
 function love.mousemoved( x, y, dx, dy, istouch )
 	mx = dx
     my = dy
+end
+
+function dist_non_absolute(x1,y1,x2,y2,x3,y3,x4,y4)
+    local ret = math.sqrt((x1 - x2)^2 + (y1 - y2)^2)
+    if not do_intersect(x1,y1,x2,y2,x3,y3,x4,y4)[1] then
+        ret = -ret
+    end
+    return ret
 end
 
 init()
