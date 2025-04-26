@@ -188,10 +188,10 @@ function main()
     local lplane=make_cplane(p.x,p.y,p.a,10,100)
 	local lvplane=make_cplane(54,63+p.z+10,p.va,10,100)
 
-    for i=1,#walls do
-        -- love.graphics.line(walls[i][1].x+20,walls[i][1].y+20,walls[i][2].x+20,walls[i][2].y+20)
-        love.graphics.polygon("line",math.sqrt((walls[i][1].x-p.x)^2+(walls[i][1].y-p.y)^2)+64,64+walls[i][1].z,math.sqrt((walls[i][2].x-p.x)^2+(walls[i][2].y-p.y)^2)+64,64+walls[i][2].z,math.sqrt((walls[i][3].x-p.x)^2+(walls[i][3].y-p.y)^2)+64,64+walls[i][3].z,math.sqrt((walls[i][4].x-p.x)^2+(walls[i][4].y-p.y)^2)+64,64+walls[i][4].z)
-    end
+    -- for i=1,#walls do
+    --     -- love.graphics.line(walls[i][1].x+20,walls[i][1].y+20,walls[i][2].x+20,walls[i][2].y+20)
+    --     love.graphics.polygon("line",math.sqrt((walls[i][1].x-p.x)^2+(walls[i][1].y-p.y)^2)+64,64+walls[i][1].z,math.sqrt((walls[i][2].x-p.x)^2+(walls[i][2].y-p.y)^2)+64,64+walls[i][2].z,math.sqrt((walls[i][3].x-p.x)^2+(walls[i][3].y-p.y)^2)+64,64+walls[i][3].z,math.sqrt((walls[i][4].x-p.x)^2+(walls[i][4].y-p.y)^2)+64,64+walls[i][4].z)
+    -- end
 
 	for i=1,#walls do
 		local t={}
@@ -229,15 +229,21 @@ function main()
             --     end
             -- end
 
-			local z1=do_intersect(vplane[1],vplane[2],vplane[3],vplane[4],--[[64,54-p.z,63,74-p.z,]]pdist+64,64+walls[i][j].z,54,63)
-			-- local z2=do_intersect(64,54-p.z,63,74-p.z,pdist+64,64-walls[i][j].z2,54,63)
-			if not z1[1] then
-				t[j][1] = false
-			end
---		local z1=do_intersect(vplane[1],vplane[2],vplane[3],vplane[4],pdist+64,64-m[i].z1,54,63)
---		local z2=do_intersect(vplane[1],vplane[2],vplane[3],vplane[4],pdist+64,64-m[i].z2,54,63)
 
-			t[j][4]=10-z1[6]
+
+-- 			local z1=do_intersect(vplane[1],vplane[2],vplane[3],vplane[4],--[[64,54-p.z,63,74-p.z,]]pdist+64,64+walls[i][j].z,54,63)
+-- 			-- local z2=do_intersect(64,54-p.z,63,74-p.z,pdist+64,64-walls[i][j].z2,54,63)
+-- 			if not z1[1] then
+-- 				t[j][1] = false
+-- 			end
+-- --		local z1=do_intersect(vplane[1],vplane[2],vplane[3],vplane[4],pdist+64,64-m[i].z1,54,63)
+-- --		local z2=do_intersect(vplane[1],vplane[2],vplane[3],vplane[4],pdist+64,64-m[i].z2,54,63)
+
+-- 			t[j][4]=10-z1[6]
+
+            t[j][4] = 10 * -(walls[i][j].z - p.z - 10) / pdist + screen.h / 40
+
+
 			-- pts[i][5]=z2[6]
             -- ::not_seen::
 		end
@@ -301,7 +307,7 @@ function main()
 
     -- love.graphics.line(lplane[1]+20,lplane[2]+20,lplane[3]+20,lplane[4]+20)
     -- love.graphics.line(p.x+20,p.y+20,p.x+20+math.sin(p.a*math.pi*2),p.y+20+math.cos(p.a*math.pi*2))
-    love.graphics.line(lvplane[1],lvplane[2],lvplane[3],lvplane[4])
+    -- love.graphics.line(lvplane[1],lvplane[2],lvplane[3],lvplane[4])
 end
 
 function hit_square(px,py,px2,py2,sx,sy,sx3,sy3,sx4,sy4,sx2,sy2)
