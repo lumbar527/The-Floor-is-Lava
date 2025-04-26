@@ -156,7 +156,7 @@ function main()
     --     p.a = p.a - .01
     -- end
     p.a = p.a - mx/100
-    -- p.va = p.va + my/100
+    p.va = p.va + my/100
     -- love.graphics.print(mx/100)
     mx = 0
     my = 0
@@ -170,15 +170,15 @@ function main()
         p.y = p.y - math.cos(p.a*math.pi*2)
         nothing,p.z = can_move(p.x-math.sin(p.a*math.pi*2),p.y-math.cos(p.a*math.pi*2),p.z,2,p.a)
     end
-    if love.keyboard.isDown("d") and can_move(p.x-math.sin(p.a*math.pi*2),p.y+math.cos(p.a*math.pi*2),p.z,2,p.a) then
-        p.x = p.x - math.sin(p.a*math.pi*2)
-        p.y = p.y + math.cos(p.a*math.pi*2)
+    if love.keyboard.isDown("d") and can_move(p.x-math.sin((p.a+.25)*math.pi*2),p.y-math.cos((p.a+.25)*math.pi*2),p.z,2,p.a) then
+        p.x = p.x - math.sin((p.a+.25)*math.pi*2)
+        p.y = p.y - math.cos((p.a+.25)*math.pi*2)
         nothing,p.z = can_move(p.x-math.sin(p.a*math.pi*2),p.y+math.cos(p.a*math.pi*2),p.z,2,p.a)
     end
-    if love.keyboard.isDown("a") and can_move(p.x+math.sin(p.a*math.pi*2),p.y-math.cos(p.a*math.pi*2),p.z,2,p.a) then
-        p.x = p.x + math.sin(p.a*math.pi*2)
-        p.y = p.y - math.cos(p.a*math.pi*2)
-        nothing,p.z = can_move(p.x+math.sin(p.a*math.pi*2),p.y-math.cos(p.a*math.pi*2),p.z,2,p.a)
+    if love.keyboard.isDown("a") and can_move(p.x+math.sin((p.a+.25)*math.pi*2),p.y-math.cos((p.a+.25)*math.pi*2),p.z,2,p.a) then
+        p.x = p.x + math.sin((p.a+.25)*math.pi*2)
+        p.y = p.y + math.cos((p.a+.25)*math.pi*2)
+        nothing,p.z = can_move(p.x+math.sin(p.a*math.pi*2),p.y+math.cos(p.a*math.pi*2),p.z,2,p.a)
     end
 
 	local pplane=make_cplane(p.x,p.y,p.a,10,20)
@@ -241,7 +241,7 @@ function main()
 
 -- 			t[j][4]=10-z1[6]
 
-            t[j][4] = 10 * -(walls[i][j].z - p.z - 10) / pdist + screen.h / 40
+            t[j][4] = 10 * -(walls[i][j].z - p.z - 10) / pdist + screen.h / 40 - math.sqrt(math.sqrt(pdist)) * (p.va - .25) * 10
 
 
 			-- pts[i][5]=z2[6]
