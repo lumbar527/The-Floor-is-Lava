@@ -6,5 +6,6 @@ A work-in-progress fps engine.
 
 - [x] Clipping
 - [x] Opacity
+- [ ] Floor/Ceiling
 - [ ] Textures
 - [ ] Combat
