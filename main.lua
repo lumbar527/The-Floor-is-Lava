@@ -60,6 +60,9 @@ function init()
 	wait=90
     mx = 0
     my = 0
+
+    love.window.setMode(screen.w,screen.h)
+
     editor_init()
 end
 
@@ -142,9 +145,6 @@ end
 function main()
     love.graphics.setColor(1,1,1)
     love.graphics.rectangle("fill",0,0,screen.w,screen.h)
-    love.graphics.setColor(0,0,0)
-    love.graphics.rectangle("line",0,0,screen.w,screen.h)
-
     local nothing = nil
 
 	pts={}
@@ -292,8 +292,8 @@ function main()
             pt2[6]*6.4,pt2[5]*12.8
             ]]--
             -- tri(pt1[6]*screen.w/20,pt1[4]*screen.h/10,pt2[6]*screen.w/20,pt2[4]*screen.h/10,pt3[6]*screen.w/20,pt3[4]*screen.h/10,c)
-            love.graphics.setColor(0,0,0)
-            triangle_function("line",pt1[6]*screen.w/20,pt1[4]*screen.h/20,pt2[6]*screen.w/20,pt2[4]*screen.h/20,pt3[6]*screen.w/20,pt3[4]*screen.h/20,pt4[6]*screen.w/20,pt4[4]*screen.h/20)
+            love.graphics.setColor(0,1/ol[i][1]*10,0)
+            triangle_function("fill",pt1[6]*screen.w/20,pt1[4]*screen.h/20,pt2[6]*screen.w/20,pt2[4]*screen.h/20,pt3[6]*screen.w/20,pt3[4]*screen.h/20,pt4[6]*screen.w/20,pt4[4]*screen.h/20)
             ::skip::
         end
 	end
