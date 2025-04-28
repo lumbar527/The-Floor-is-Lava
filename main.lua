@@ -241,7 +241,7 @@ function main()
 
 -- 			t[j][4]=10-z1[6]
 
-            t[j][4] = 10 * -(walls[i][j].z - p.z - 10) / pdist + screen.h / 40 - math.sqrt(math.sqrt(pdist)) * (p.va - .25) * 10
+            t[j][4] = 10 * -(walls[i][j].z - p.z - 10) / pdist + screen.h / 40 - math.sqrt(math.sqrt(math.sqrt(math.sqrt(pdist)))) * (p.va - .25) * 10
 
 
 			-- pts[i][5]=z2[6]
@@ -280,9 +280,9 @@ function main()
 
 	for i=#ol,1,-1 do
 		local px=ol[i]
-		local pt1=pts[px[2]][1]
-		local pt2=pts[px[2]][2]
-		local pt3=pts[px[2]][3]
+        local pt1=pts[px[2]][1]
+        local pt2=pts[px[2]][2]
+        local pt3=pts[px[2]][3]
         local pt4=pts[px[2]][4]
         if pt1[1] and pt2[1] and pt3[1] and pt4[1] then
             --[[
