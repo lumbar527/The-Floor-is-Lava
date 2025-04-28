@@ -241,7 +241,7 @@ function main()
 
 -- 			t[j][4]=10-z1[6]
 
-            t[j][4] = 10 * -(walls[i][j].z - p.z - 10) / pdist + screen.h / 40 - math.sqrt(math.sqrt(math.sqrt(math.sqrt(pdist)))) * (p.va - .25) * 10
+            t[j][4] = 10 * -(walls[i][j].z - p.z - 10) / pdist + screen.h / 40 - (p.va - .25) * 10
 
 
 			-- pts[i][5]=z2[6]
