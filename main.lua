@@ -148,6 +148,8 @@ function main()
     local nothing = nil
 
 	pts={}
+    flr_draw = {}
+    ceil_draw = {}
 
     -- if love.keyboard.isDown("left") then
     --     p.a = p.a + .01
@@ -195,6 +197,8 @@ function main()
 
 	for i=1,#walls do
 		local t={}
+        local this_ceil = {index=walls[i][5]}
+        local this_floor = {index=walls[i][5]}
 		for j=1,4 do
             t[j] = do_intersect(pplane[1],pplane[2],pplane[3],pplane[4],walls[i][j].x,walls[i][j].y,p.x,p.y)
 			-- add(t,do_intersect(pplane[1],pplane[2],pplane[3],pplane[4],walls[i][j].x,walls[i][j].y,p.x,p.y))
@@ -243,14 +247,21 @@ function main()
 
             t[j][4] = 10 * -(walls[i][j].z - p.z - 10) / pdist + screen.h / 40 - (p.va - .25) * 10
 
+            if walls[i][j].z == sectors[walls[i][5]].f then
+                this_floor[#this_floor+1] = t[j]
+            end
+            if walls[i][j].z == sectors[walls[i][5]].c then
+                this_ceil[#this_ceil+1] = t[j]
+            end
 
 			-- pts[i][5]=z2[6]
             -- ::not_seen::
 		end
 		pts[#pts+1] = t
+        flr_draw[#flr_draw+1] = this_floor
+        -- flr_draw = {{t[j],t[j]}...}
 	end
 	
-	-- redo for walls
     --[[
     What shout I tell it to draw? How about this:
         Idea #1:
@@ -297,6 +308,27 @@ function main()
             ::skip::
         end
 	end
+
+    -- for i=1,#flr_draw do
+    --     log_error(tostring(flr_draw[i].index))
+    -- end
+
+    flr_draw = merge(flr_draw)
+    log_error(#flr_draw)
+    for i=1,#flr_draw do
+        local l = {}
+        for j=1,#flr_draw[i] do
+            l[#l+1] = flr_draw[i][j][6]*screen.w/20
+            l[#l+1] = flr_draw[i][j][4]*screen.h/20
+            -- log_error(l[j])
+        end
+        love.graphics.setColor(0,0,1)
+        if #l > 5 then
+            log_error("Drawn")
+            triangle_function("fill",l)
+        end
+    end
+
     if love.keyboard.isDown("e") then
         editor = true
     end
@@ -361,7 +393,7 @@ function generate_walls(sect,map,plane,vplane) -- maybe put clipping here
                             {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = floor},
                             {x = map[sect[i].points[1]].x, y = map[sect[i].points[1]].y, z = floor},
                             {x = map[sect[i].points[1]].x, y = map[sect[i].points[1]].y, z = ceiling},
-                            {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = ceiling},
+                            {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = ceiling},i
                         }
                         val[#val] = constrain_wall(val[#val],plane,vplane)
                     end
@@ -371,7 +403,7 @@ function generate_walls(sect,map,plane,vplane) -- maybe put clipping here
                             {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = floor2},
                             {x = map[sect[i].points[1]].x, y = map[sect[i].points[1]].y, z = floor2},
                             {x = map[sect[i].points[1]].x, y = map[sect[i].points[1]].y, z = ceiling2},
-                            {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = ceiling2},
+                            {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = ceiling2},i
                         }
                         val[#val] = constrain_wall(val[#val],plane,vplane)
                     end
@@ -381,7 +413,7 @@ function generate_walls(sect,map,plane,vplane) -- maybe put clipping here
                             {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = sect[i].f},
                             {x = map[sect[i].points[1]].x, y = map[sect[i].points[1]].y, z = sect[i].f},
                             {x = map[sect[i].points[1]].x, y = map[sect[i].points[1]].y, z = sect[i].c},
-                            {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = sect[i].c},
+                            {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = sect[i].c},i
                         }
                         val[#val] = constrain_wall(val[#val],plane,vplane)
                     end
@@ -402,7 +434,7 @@ function generate_walls(sect,map,plane,vplane) -- maybe put clipping here
                             {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = floor},
                             {x = map[sect[i].points[j+1]].x, y = map[sect[i].points[j+1]].y, z = floor},
                             {x = map[sect[i].points[j+1]].x, y = map[sect[i].points[j+1]].y, z = ceiling},
-                            {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = ceiling},
+                            {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = ceiling},i
                         }
                         val[#val] = constrain_wall(val[#val],plane,vplane)
                     end
@@ -412,7 +444,7 @@ function generate_walls(sect,map,plane,vplane) -- maybe put clipping here
                             {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = floor2},
                             {x = map[sect[i].points[j+1]].x, y = map[sect[i].points[j+1]].y, z = floor2},
                             {x = map[sect[i].points[j+1]].x, y = map[sect[i].points[j+1]].y, z = ceiling2},
-                            {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = ceiling2},
+                            {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = ceiling2},i
                         }
                         val[#val] = constrain_wall(val[#val],plane,vplane)
                     end
@@ -422,7 +454,7 @@ function generate_walls(sect,map,plane,vplane) -- maybe put clipping here
                             {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = sect[i].f},
                             {x = map[sect[i].points[j+1]].x, y = map[sect[i].points[j+1]].y, z = sect[i].f},
                             {x = map[sect[i].points[j+1]].x, y = map[sect[i].points[j+1]].y, z = sect[i].c},
-                            {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = sect[i].c},
+                            {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = sect[i].c},i
                         }
                         -- file = love.filesystem.newFile("error.txt")
                         -- file:open("a")
@@ -734,6 +766,58 @@ function dist_non_absolute(x1,y1,x2,y2,x3,y3,x4,y4)
     end
     return ret
 end
+
+function merge(list)
+    local ret = {}
+    for i=1,#list do
+        local set = false
+        for j=1,#ret do
+            if ret[j].index == list[i].index then -- list[i][1] = t[j]
+                ret[j] = combine(ret[j],list[i])
+                ret[j].index = list[i].index
+                -- ret[j] = {ret[j][1],ret[j][2],list[i][1],list[i][2],index=list[i].index}
+                set = true
+            end
+        end
+        if not set then
+            ret[#ret+1] = list[i]
+        end
+    end
+    return ret
+end
+
+function combine(l1,l2)
+    local ret = {}
+    for i=1,#l1 do
+        ret[#ret+1] = l1[i]
+    end
+    for i=2,#l2 do
+        ret[#ret+1] = l2[i]
+    end
+    return ret
+end
+
+--[[
+l = 
+{
+    {a,b,index=1},
+    {c,d,index=1},
+    {e,f,index=2},
+    {g,h,index=3},
+    {i,j,index=3}
+}
+merge(l)
+i = 1
+set = false
+#ret = 0
+ret[1] = list[1]
+i = 2
+set = false
+#ret = 1
+list[2].index == ret[1].index
+ret[1] = {a,b,c,d,index=1}
+
+]]
 
 init()
 

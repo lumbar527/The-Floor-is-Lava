@@ -1,4 +1,4 @@
-# The-Floor-is-Lava
+# The-Floor-is-Lava (Little Omega Engine)
 
 A work-in-progress fps engine. The name is because one idea for the game involved being on an alien planet with lava.
 Inspired by [Marathon](https://alephone.lhowon.org).
