@@ -259,7 +259,7 @@ function main()
 		end
 		pts[#pts+1] = t
         flr_draw[#flr_draw+1] = this_floor
-        -- flr_draw = {{t[j],t[j]}...}
+        ceil_draw[#ceil_draw+1] = this_ceil -- figure out how to order
 	end
 	
     --[[
@@ -289,6 +289,34 @@ function main()
 	end
 	sort(ol)
 
+    flr_draw = merge(flr_draw)
+    for i=1,#flr_draw do
+        local l = {}
+        for j=1,#flr_draw[i] do
+            l[#l+1] = flr_draw[i][j][6]*screen.w/20
+            l[#l+1] = flr_draw[i][j][4]*screen.h/20
+            -- log_error(l[j])
+        end
+        love.graphics.setColor(0,0,1)
+        if #l > 5 then
+            triangle_function("fill",l)
+        end
+    end
+
+    ceil_draw = merge(ceil_draw)
+    for i=1,#ceil_draw do
+        local l = {}
+        for j=1,#ceil_draw[i] do
+            l[#l+1] = ceil_draw[i][j][6]*screen.w/20
+            l[#l+1] = ceil_draw[i][j][4]*screen.h/20
+            -- log_error(l[j])
+        end
+        love.graphics.setColor(0,0,1)
+        if #l > 5 then
+            triangle_function("fill",l)
+        end
+    end
+
 	for i=#ol,1,-1 do
 		local px=ol[i]
         local pt1=pts[px[2]][1]
@@ -308,26 +336,6 @@ function main()
             ::skip::
         end
 	end
-
-    -- for i=1,#flr_draw do
-    --     log_error(tostring(flr_draw[i].index))
-    -- end
-
-    flr_draw = merge(flr_draw)
-    log_error(#flr_draw)
-    for i=1,#flr_draw do
-        local l = {}
-        for j=1,#flr_draw[i] do
-            l[#l+1] = flr_draw[i][j][6]*screen.w/20
-            l[#l+1] = flr_draw[i][j][4]*screen.h/20
-            -- log_error(l[j])
-        end
-        love.graphics.setColor(0,0,1)
-        if #l > 5 then
-            log_error("Drawn")
-            triangle_function("fill",l)
-        end
-    end
 
     if love.keyboard.isDown("e") then
         editor = true
