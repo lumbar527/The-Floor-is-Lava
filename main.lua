@@ -248,10 +248,10 @@ function main()
 
             t[j][4] = 10 * -(walls[i][j].z - p.z - 10) / pdist + screen.h / 40 - (p.va - .25) * 10
 
-            if walls[i][j].z == sectors[walls[i][5]].f and t[j][1] then
+            if (walls[i][j].z == sectors[walls[i][5]].f or walls[i][j].z == sectors[walls[i][5]].c) and t[j][1] then
                 this_floor[#this_floor+1] = t[j]
             end
-            if walls[i][j].z == sectors[walls[i][5]].c and t[j][1] then
+            if (walls[i][j].z == sectors[walls[i][5]].c or walls[i][j].z == sectors[walls[i][5]].f) and t[j][1] then
                 this_ceil[#this_ceil+1] = t[j]
             end
 
@@ -382,37 +382,38 @@ function main()
         end
         -- log_error("End "..tostring(flr_draw[i][1]))
     end
-    
-    centers = {}
-    for i=1,#sectors do
-        centers[i] = false
-    end
-    for i=1,#ceil_draw do
-        -- log_error("Start "..tostring(flr_draw[i][1]))
-        if not centers[ceil_draw[i].index] then
-            local point_list = {}
-            -- x = ceil_draw[i][1][4] + 1
-            for j=1,#sectors[ceil_draw[i].index].points do
-                point_list[#point_list+1] = map[sectors[ceil_draw[i].index].points[j]].x
-                point_list[#point_list+1] = map[sectors[ceil_draw[i].index].points[j]].y
-            end
-            if point_in_polygon(p.x,p.y,point_list) then
-                centers[ceil_draw[i].index] = {0,0,0,0,0,10}
-                -- log_error("PIP true")
-            else
-                centers[ceil_draw[i].index] = {0,0,0,ceil_draw[i][1][4],0,ceil_draw[i][1][6]}
-                -- log_error("PIP false")
-            end
-        else
-            -- x = ceil_draw[i][1][4] + 1
-            -- x = ceil_draw[i][2][4] + 1 -- nil
-            -- x = centers[ceil_draw[i].index][4] + 1
-            local l = {ceil_draw[i][1][6]*screen.w/20,ceil_draw[i][1][4]*screen.h/20,ceil_draw[i][2][6]*screen.w/20,ceil_draw[i][2][4]*screen.h/20,centers[ceil_draw[i].index][6]*screen.w/20,centers[ceil_draw[i].index][4]*screen.w/20}
-            triangle_function("fill",l)
-            -- log_error("Drawn")
-        end
-        -- log_error("End "..tostring(flr_draw[i][1]))
-    end
+
+    -- not working well enough
+    -- centers = {}
+    -- for i=1,#sectors do
+    --     centers[i] = false
+    -- end
+    -- for i=1,#ceil_draw do
+    --     -- log_error("Start "..tostring(flr_draw[i][1]))
+    --     if not centers[ceil_draw[i].index] then
+    --         local point_list = {}
+    --         -- x = ceil_draw[i][1][4] + 1
+    --         for j=1,#sectors[ceil_draw[i].index].points do
+    --             point_list[#point_list+1] = map[sectors[ceil_draw[i].index].points[j]].x
+    --             point_list[#point_list+1] = map[sectors[ceil_draw[i].index].points[j]].y
+    --         end
+    --         if point_in_polygon(p.x,p.y,point_list) then
+    --             centers[ceil_draw[i].index] = {0,0,0,0,0,10}
+    --             -- log_error("PIP true")
+    --         else
+    --             centers[ceil_draw[i].index] = {0,0,0,ceil_draw[i][1][4],0,ceil_draw[i][1][6]}
+    --             -- log_error("PIP false")
+    --         end
+    --     else
+    --         -- x = ceil_draw[i][1][4] + 1
+    --         -- x = ceil_draw[i][2][4] + 1 -- nil
+    --         -- x = centers[ceil_draw[i].index][4] + 1
+    --         local l = {ceil_draw[i][1][6]*screen.w/20,ceil_draw[i][1][4]*screen.h/20,ceil_draw[i][2][6]*screen.w/20,ceil_draw[i][2][4]*screen.h/20,centers[ceil_draw[i].index][6]*screen.w/20,centers[ceil_draw[i].index][4]*screen.w/20}
+    --         triangle_function("fill",l)
+    --         -- log_error("Drawn")
+    --     end
+    --     -- log_error("End "..tostring(flr_draw[i][1]))
+    -- end
 
 	for i=#ol,1,-1 do
 		local px=ol[i]
