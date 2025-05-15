@@ -259,7 +259,7 @@ function main()
             -- ::not_seen::
 		end
 		pts[#pts+1] = t
-        if this_floor[1] ~= nil and this_floor[2] ~= nil then
+        if this_floor[1] ~= nil and this_floor[2] ~= nil and this_ceil[1] ~= nil and this_ceil[2] ~= nil then
             flr_draw[#flr_draw+1] = this_floor
             ceil_draw[#ceil_draw+1] = this_ceil
         end
@@ -350,26 +350,8 @@ function main()
     --     end
     -- end
 
-	for i=#ol,1,-1 do
-		local px=ol[i]
-        local pt1=pts[px[2]][1]
-        local pt2=pts[px[2]][2]
-        local pt3=pts[px[2]][3]
-        local pt4=pts[px[2]][4]
-        if pt1[1] and pt2[1] and pt3[1] and pt4[1] then
-            --[[
-            pt1[6]*6.4,pt1[4]*12.8
-            pt2[6]*6.4,pt2[4]*12.8
-            pt1[6]*6.4,pt1[5]*12.8
-            pt2[6]*6.4,pt2[5]*12.8
-            ]]--
-            -- tri(pt1[6]*screen.w/20,pt1[4]*screen.h/10,pt2[6]*screen.w/20,pt2[4]*screen.h/10,pt3[6]*screen.w/20,pt3[4]*screen.h/10,c)
-            love.graphics.setColor(0,1/ol[i][1]*10,0)
-            triangle_function("fill",pt1[6]*screen.w/20,pt1[4]*screen.h/20,pt2[6]*screen.w/20,pt2[4]*screen.h/20,pt3[6]*screen.w/20,pt3[4]*screen.h/20,pt4[6]*screen.w/20,pt4[4]*screen.h/20)
-            ::skip::
-        end
-	end
     
+    love.graphics.setColor(0,0,1)
     centers = {}
     for i=1,#sectors do
         centers[i] = false
@@ -378,7 +360,7 @@ function main()
         -- log_error("Start "..tostring(flr_draw[i][1]))
         if not centers[flr_draw[i].index] then
             local point_list = {}
-            x = flr_draw[i][1][4] + 1
+            -- x = flr_draw[i][1][4] + 1
             for j=1,#sectors[flr_draw[i].index].points do
                 point_list[#point_list+1] = map[sectors[flr_draw[i].index].points[j]].x
                 point_list[#point_list+1] = map[sectors[flr_draw[i].index].points[j]].y
@@ -400,6 +382,57 @@ function main()
         end
         -- log_error("End "..tostring(flr_draw[i][1]))
     end
+    
+    centers = {}
+    for i=1,#sectors do
+        centers[i] = false
+    end
+    for i=1,#ceil_draw do
+        -- log_error("Start "..tostring(flr_draw[i][1]))
+        if not centers[ceil_draw[i].index] then
+            local point_list = {}
+            -- x = ceil_draw[i][1][4] + 1
+            for j=1,#sectors[ceil_draw[i].index].points do
+                point_list[#point_list+1] = map[sectors[ceil_draw[i].index].points[j]].x
+                point_list[#point_list+1] = map[sectors[ceil_draw[i].index].points[j]].y
+            end
+            if point_in_polygon(p.x,p.y,point_list) then
+                centers[ceil_draw[i].index] = {0,0,0,0,0,10}
+                -- log_error("PIP true")
+            else
+                centers[ceil_draw[i].index] = {0,0,0,ceil_draw[i][1][4],0,ceil_draw[i][1][6]}
+                -- log_error("PIP false")
+            end
+        else
+            -- x = ceil_draw[i][1][4] + 1
+            -- x = ceil_draw[i][2][4] + 1 -- nil
+            -- x = centers[ceil_draw[i].index][4] + 1
+            local l = {ceil_draw[i][1][6]*screen.w/20,ceil_draw[i][1][4]*screen.h/20,ceil_draw[i][2][6]*screen.w/20,ceil_draw[i][2][4]*screen.h/20,centers[ceil_draw[i].index][6]*screen.w/20,centers[ceil_draw[i].index][4]*screen.w/20}
+            triangle_function("fill",l)
+            -- log_error("Drawn")
+        end
+        -- log_error("End "..tostring(flr_draw[i][1]))
+    end
+
+	for i=#ol,1,-1 do
+		local px=ol[i]
+        local pt1=pts[px[2]][1]
+        local pt2=pts[px[2]][2]
+        local pt3=pts[px[2]][3]
+        local pt4=pts[px[2]][4]
+        if pt1[1] and pt2[1] and pt3[1] and pt4[1] then
+            --[[
+            pt1[6]*6.4,pt1[4]*12.8
+            pt2[6]*6.4,pt2[4]*12.8
+            pt1[6]*6.4,pt1[5]*12.8
+            pt2[6]*6.4,pt2[5]*12.8
+            ]]--
+            -- tri(pt1[6]*screen.w/20,pt1[4]*screen.h/10,pt2[6]*screen.w/20,pt2[4]*screen.h/10,pt3[6]*screen.w/20,pt3[4]*screen.h/10,c)
+            love.graphics.setColor(0,1/ol[i][1]*10,0)
+            triangle_function("fill",pt1[6]*screen.w/20,pt1[4]*screen.h/20,pt2[6]*screen.w/20,pt2[4]*screen.h/20,pt3[6]*screen.w/20,pt3[4]*screen.h/20,pt4[6]*screen.w/20,pt4[4]*screen.h/20)
+            ::skip::
+        end
+	end
 
     -- centers = {}
     -- for i=1,#sectors do
