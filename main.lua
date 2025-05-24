@@ -383,37 +383,37 @@ function main()
         -- log_error("End "..tostring(flr_draw[i][1]))
     end
 
-    -- not working well enough
-    -- centers = {}
-    -- for i=1,#sectors do
-    --     centers[i] = false
-    -- end
-    -- for i=1,#ceil_draw do
-    --     -- log_error("Start "..tostring(flr_draw[i][1]))
-    --     if not centers[ceil_draw[i].index] then
-    --         local point_list = {}
-    --         -- x = ceil_draw[i][1][4] + 1
-    --         for j=1,#sectors[ceil_draw[i].index].points do
-    --             point_list[#point_list+1] = map[sectors[ceil_draw[i].index].points[j]].x
-    --             point_list[#point_list+1] = map[sectors[ceil_draw[i].index].points[j]].y
-    --         end
-    --         if point_in_polygon(p.x,p.y,point_list) then
-    --             centers[ceil_draw[i].index] = {0,0,0,0,0,10}
-    --             -- log_error("PIP true")
-    --         else
-    --             centers[ceil_draw[i].index] = {0,0,0,ceil_draw[i][1][4],0,ceil_draw[i][1][6]}
-    --             -- log_error("PIP false")
-    --         end
-    --     else
-    --         -- x = ceil_draw[i][1][4] + 1
-    --         -- x = ceil_draw[i][2][4] + 1 -- nil
-    --         -- x = centers[ceil_draw[i].index][4] + 1
-    --         local l = {ceil_draw[i][1][6]*screen.w/20,ceil_draw[i][1][4]*screen.h/20,ceil_draw[i][2][6]*screen.w/20,ceil_draw[i][2][4]*screen.h/20,centers[ceil_draw[i].index][6]*screen.w/20,centers[ceil_draw[i].index][4]*screen.w/20}
-    --         triangle_function("fill",l)
-    --         -- log_error("Drawn")
-    --     end
-    --     -- log_error("End "..tostring(flr_draw[i][1]))
-    -- end
+    -- it's drawing from the floor
+    centers = {}
+    for i=1,#sectors do
+        centers[i] = false
+    end
+    for i=1,#ceil_draw do
+        -- log_error("Start "..tostring(flr_draw[i][1]))
+        if not centers[ceil_draw[i].index] then
+            local point_list = {}
+            -- x = ceil_draw[i][1][4] + 1
+            for j=1,#sectors[ceil_draw[i].index].points do
+                point_list[#point_list+1] = map[sectors[ceil_draw[i].index].points[j]].x
+                point_list[#point_list+1] = map[sectors[ceil_draw[i].index].points[j]].y
+            end
+            if point_in_polygon(p.x,p.y,point_list) then
+                centers[ceil_draw[i].index] = {0,0,0,0,0,10}
+                -- log_error("PIP true")
+            else
+                centers[ceil_draw[i].index] = {0,0,0,ceil_draw[i][1][4],0,ceil_draw[i][1][6]}
+                -- log_error("PIP false")
+            end
+        else
+            -- x = ceil_draw[i][1][4] + 1
+            -- x = ceil_draw[i][2][4] + 1 -- nil
+            -- x = centers[ceil_draw[i].index][4] + 1
+            local l = {ceil_draw[i][1][6]*screen.w/20,ceil_draw[i][1][4]*screen.h/20,ceil_draw[i][2][6]*screen.w/20,ceil_draw[i][2][4]*screen.h/20,centers[ceil_draw[i].index][6]*screen.w/20,centers[ceil_draw[i].index][4]*screen.w/20}
+            triangle_function("fill",l)
+            -- log_error("Drawn")
+        end
+        -- log_error("End "..tostring(flr_draw[i][1]))
+    end
 
 	for i=#ol,1,-1 do
 		local px=ol[i]
@@ -527,20 +527,20 @@ function generate_walls(sect,map,plane,vplane) -- maybe put clipping here
                     if floor~=ceiling then
                         val[#val+1] =
                         {
-                            {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = floor},
-                            {x = map[sect[i].points[1]].x, y = map[sect[i].points[1]].y, z = floor},
+                            {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = ceiling},
                             {x = map[sect[i].points[1]].x, y = map[sect[i].points[1]].y, z = ceiling},
-                            {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = ceiling},i
+                            {x = map[sect[i].points[1]].x, y = map[sect[i].points[1]].y, z = floor},
+                            {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = floor},i
                         }
                         val[#val] = constrain_wall(val[#val],plane,vplane)
                     end
                     if floor2~=ceiling2 then
                         val[#val+1] =
                         {
-                            {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = floor2},
-                            {x = map[sect[i].points[1]].x, y = map[sect[i].points[1]].y, z = floor2},
+                            {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = ceiling2},
                             {x = map[sect[i].points[1]].x, y = map[sect[i].points[1]].y, z = ceiling2},
-                            {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = ceiling2},i
+                            {x = map[sect[i].points[1]].x, y = map[sect[i].points[1]].y, z = floor2},
+                            {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = floor2},i
                         }
                         val[#val] = constrain_wall(val[#val],plane,vplane)
                     end
@@ -568,20 +568,20 @@ function generate_walls(sect,map,plane,vplane) -- maybe put clipping here
                     if floor~=ceiling then
                         val[#val+1] =
                         {
-                            {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = floor},
-                            {x = map[sect[i].points[j+1]].x, y = map[sect[i].points[j+1]].y, z = floor},
+                            {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = ceiling},
                             {x = map[sect[i].points[j+1]].x, y = map[sect[i].points[j+1]].y, z = ceiling},
-                            {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = ceiling},i
+                            {x = map[sect[i].points[j+1]].x, y = map[sect[i].points[j+1]].y, z = floor},
+                            {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = floor},i
                         }
                         val[#val] = constrain_wall(val[#val],plane,vplane)
                     end
                     if floor2~=ceiling2 then
                         val[#val+1] =
                         {
-                            {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = floor2},
-                            {x = map[sect[i].points[j+1]].x, y = map[sect[i].points[j+1]].y, z = floor2},
+                            {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = ceiling2},
                             {x = map[sect[i].points[j+1]].x, y = map[sect[i].points[j+1]].y, z = ceiling2},
-                            {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = ceiling2},i
+                            {x = map[sect[i].points[j+1]].x, y = map[sect[i].points[j+1]].y, z = floor2},
+                            {x = map[sect[i].points[j]].x, y = map[sect[i].points[j]].y, z = floor2},i
                         }
                         val[#val] = constrain_wall(val[#val],plane,vplane)
                     end
